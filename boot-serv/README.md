@@ -14,7 +14,8 @@ Quorum 网络引导服务
 [9. 删除节点信息 ](#9-删除节点信息)\
 [10. 修改节点信息 ](#10-修改节点信息)\
 [11. 查询节点信息 ](#11-查询节点信息)\
-[12. 节点是否存在 ](#12-节点是否存在)
+[12. 节点是否存在 ](#12-节点是否存在)\
+[13. 联盟引导信息 ](#13-联盟引导信息)
 
 ## 接口描述
 
@@ -467,3 +468,49 @@ Response: {
 > id: 唯一标识\
 > publicKey: 节点公钥\
 > exist: 是否存在
+
+
+### [13. 联盟引导信息](#接口目录)
+GET /consortiums/{id}/boot
+```
+Request: {
+    "URL": "http://{{HOSTNAME}}/consortiums/consortium02/boot",
+    "Method": "GET", 
+    "Header": {
+        "Content-Type": "application/json"
+    }
+}
+```
+参数说明:
+> id: 唯一标识，必选
+
+```
+Response: {
+    "code": 200,
+    "message": "Success.",
+    "data": {
+        "id": "consortium01",
+        "detail": "consortium01 detail 1..",
+        "chainId": 10000,
+        "consensus": "raft",
+        "difficulty": "0x0",
+        "gasLimit": "0xE0000000",
+        "alloc": {
+            "0xed9d02e382b34818e88b88a309c7fe71e65f419d": {
+                "balance": "1000000000000000000000000000"
+            },
+            "0xed9d02e382b34818e88b88a309c7fe71e65f419e": {
+                "balance": "1000000000000000000000000000"
+            }
+        },
+        "nodes": [{
+            "publicKey": "27dc06acd0873ee3fc01bea8ad918a7059f8b7c7403ba964c02ec23560878abde3688f72cbb8fe7dfbc6312367d2578608e4c55402a52cb6cd053434fcc7b22b",
+            "host": "127.0.0.1",
+            "port": 8999,
+            "raftport": 9888
+        }]
+    }
+}
+```
+响应说明：
+> 略

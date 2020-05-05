@@ -104,10 +104,6 @@ func New(w http.ResponseWriter, r *http.Request) {
 	}{}
 	decoder.Decode(&param)
 
-	if strings.ToLower(param.Consensus) == "istanbul" {
-		common.Response(&w, common.Error, "Temporarily not supported.", nil)
-		return
-	}
 	if strings.ToLower(param.Consensus) != "raft" && strings.ToLower(param.Consensus) != "istanbul" {
 		common.Response(&w, common.Error, "Consensus is invalid.", nil)
 		return

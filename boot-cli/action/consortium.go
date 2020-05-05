@@ -1,11 +1,8 @@
-package http
+package action
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
-	"fmt"
-	"github.com/mahuaibo/quorum-boot/boot-cli/common"
 )
 
 type Alloc map[string]Account
@@ -30,57 +27,6 @@ type Istanbul struct {
 type CodeSizeConfig struct {
 	Block uint64 `json:"block"`
 	Size  uint64 `json:"size"`
-}
-
-func GetConsortium(serverUrl, consortium string) ([]byte, []byte, error) {
-	value, err := common.HttpGet(serverUrl, "/consortiums/"+consortium+"/boot")
-	if err != nil {
-		return nil, nil, err
-	}
-	response := struct {
-		Code    uint64 `json:"code"`
-		Message string `json:"message"`
-		Data    struct {
-			Id         string `json:"id"`
-			Detail     string `json:"detail"`
-			ChainId    uint64 `json:"chainId"`
-			Consensus  string `json:"consensus"`
-			Difficulty string `json:"difficulty"`
-			GasLimit   string `json:"gasLimit"`
-			Alloc      Alloc  `json:"alloc"`
-			Nodes      []Node `json:"nodes"`
-		} `json:"data"`
-	}{}
-	err = json.Unmarshal(value, &response)
-	if err != nil {
-		return nil, nil, err
-	}
-	if response.Code != 200 {
-		return nil, nil, errors.New(response.Message)
-	}
-	var genesis []byte
-	if response.Data.Consensus == "raft" {
-		genesis, err = raftGenesis(response.Data.ChainId, response.Data.Difficulty, response.Data.GasLimit, response.Data.Alloc)
-	} else if response.Data.Consensus == "istanbul" {
-		genesis, err = istanbulGenesis(response.Data.ChainId, response.Data.Difficulty, response.Data.GasLimit, response.Data.Alloc)
-	}
-	if err != nil {
-		return nil, nil, err
-	}
-
-	enodes := []string{}
-	for _, node := range response.Data.Nodes {
-		enode := fmt.Sprintf(`enode://%s@%s:%d?discport=0&raftport=%d`, node.PublicKey, node.Host, node.Port, node.RaftPort)
-		enodes = append(enodes, enode)
-	}
-	bf := bytes.NewBuffer([]byte{})
-	jsonEncoder := json.NewEncoder(bf)
-	jsonEncoder.SetEscapeHTML(false)
-	jsonEncoder.Encode(enodes)
-	if err != nil {
-		return nil, nil, err
-	}
-	return genesis, bf.Bytes(), err
 }
 
 // istanbul
